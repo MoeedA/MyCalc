@@ -1,0 +1,96 @@
+.title {
+    font-size: 6vw; /* Adjust font size relative to viewport width */
+    text-align: center; /* Center the text horizontally */
+    margin-bottom: 5vw; /* Adjust margin bottom relative to viewport width */
+  }
+  
+  .canvas-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Set the container to occupy the full viewport height */
+  }
+  .text-box {
+    width: 80%; /* Adjust text box width relative to parent container */
+    max-width: 400px; /* Set maximum width for larger screens */
+    margin-top: 3vw; /* Adjust margin top relative to viewport width */
+    padding: 1.5vw; /* Adjust padding relative to viewport width */
+    border: 1px solid #333; /* Border for text box */
+    border-radius: 5px;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 2vw; /* Adjust font size relative to viewport width */
+    text-align: center; /* Center the text horizontally */
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  .calendar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .week-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1px; /* Add padding to create space between the border and boxes */
+    display: flex; 
+    justify-content: center; /* Horizontally center the day boxes */
+    align-items: stretch; /* Stretch the day boxes from top to bottom */
+  }
+  
+  .week {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .day {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px; /* Add margin to create space between the boxes */
+    min-width: 150px; /* Adjust the width of the day boxes */
+    margin-bottom: 20px;
+    flex: 1 1 10%;
+    word-wrap: break-word;
+  }
+  
+  .task-input {
+    width: 90%; /* width of the day box */
+    height: 80%;
+    margin-top: 20%;
+    width: calc(100% - 20px);
+    word-wrap: break-word;
+   
+    
+  }
+  
+  .date-text {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .save-button {
+    margin-left: auto;
+  }
+
+  
+  
+  
+  @media screen and (max-width: 768px) {
+    /* Adjustments for smaller screens */
+    .title {
+      font-size: 5vw; 
+      margin-bottom: 3vw; 
+    }
+  
+    .text-box {
+      width: 80%; 
+      font-size: 3vw; 
+    }
+  }
+  

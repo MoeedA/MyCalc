@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
+</head>
+<body>
+  <div class="calendar-container">
+    <div class="date-text"></div> <!-- Date -->
+    <h1>Weekly Calendar</h1>
+    <div class="week-container">
+      <div class="week"></div>
+    </div>
+    <div class="navigation">
+      <button id="prev-week" onclick="loadPrevWeek()">Previous Week</button>
+      <button id="next-week" onclick="loadNextWeek()">Next Week</button>
+    </div>
+    <button onclick="goToHomePage()">Home</button>
+
+    <!-- New section for OpenAI interaction -->
+    <div class="openai-container">
+      <textarea id="openai-input" rows="4" cols="50" placeholder="Enter text to be processed by OpenAI..."></textarea><br>
+      <button onclick="processOpenAIInput()">Process with OpenAI</button>
+    </div>
+  </div>
+
+  <script>
+    function goToHomePage() {
+      window.location.href = "index.html"; 
+    }
+
+    async function processOpenAIInput() {
+      const inputText = document.getElementById('openai-input').value.toLowerCase(); // Convert input text to lowercase
+      console.log("Input Text:", inputText); // Log the input text
+
+      // Remove the day of the week and the word 'on' from the input text
+      const dayOfWeekRegex = /(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)/i;
+      const cleanedText = inputText.replace(dayOfWeekRegex, '').replace(/\bon\b/i, '').trim();
+      console.log("Cleaned Text:", cleanedText); // Log the cleaned text
+
+      // Update the corresponding day box with the cleaned text
+      const dayBoxes = document.querySelectorAll('.day');
+      console.log("Day Boxes:", dayBoxes); // Log the day boxes
+      dayBoxes.forEach(dayBox => {
+        const dayName = dayBox.dataset.day.split(',')[0].toLowerCase(); // Extract and convert the day name to lowercase
+        console.log("Day Name:", dayName); // Log the day name
+        if (inputText.includes(dayName)) {
+          const inputField = dayBox.querySelector('.task-input');
+          console.log("Input Field:", inputField); // Log the input field
+          inputField.value = cleanedText;
+          saveChanges(dayBox); // Save the new event
+        }
+      });
+    }
+
+   // Function to save changes
+function saveChanges(dayBox) {
+  var inputField = dayBox.querySelector('.task-input');
+  var newText = inputField.value;
+  var dayName = inputField.getAttribute('data-day').toLowerCase(); // Convert day name to lowercase
+  var currentDate = new Date();
+  var key = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate() + '-' + dayName;
+  localStorage.setItem(key, newText); // Save text to localStorage 
+}
+
+
+    function loadNextWeek() {
+      var currentDateText = document.querySelector(".date-text");
+      var currentDate = new Date();
+      if (localStorage.getItem("currentDate")) {
+        currentDate = new Date(localStorage.getItem("currentDate"));
+      }
+      currentDate.setDate(currentDate.getDate() + 7); // Increase date by 1 week
+      var options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      currentDateText.innerText = currentDate.toLocaleDateString('en-US', options);
+      localStorage.setItem("currentDate", currentDate); // Save current date to localStorage
+      loadWeek(currentDate); // Load the week for the new date
+    }
+
+    function loadPrevWeek() {
+      var currentDateText = document.querySelector(".date-text");
+      var currentDate = new Date();
+      if (localStorage.getItem("currentDate")) {
+        currentDate = new Date(localStorage.getItem("currentDate"));
+      }
+      currentDate.setDate(currentDate.getDate() - 7); // Lower date by 1 week
+      var options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      currentDateText.innerText = currentDate.toLocaleDateString('en-US', options);
+      localStorage.setItem("currentDate", currentDate); // Save current date to localStorage
+      loadWeek(currentDate); // Load the week for the new date
+    }
+
+    // Function to load the next weeks
+    function loadWeek(date) {
+      var weekContainer = document.querySelector(".week");
+      weekContainer.innerHTML = ""; // Clear previous content
+
+      var options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      for (var i = 0; i < 7; i++) {
+        var day = new Date(date);
+        day.setDate(day.getDate() + i);
+        var dayBox = document.createElement("div");
+        dayBox.classList.add("day");
+        dayBox.dataset.day = day.toLocaleDateString('en-US', options);
+        dayBox.innerHTML = day.toLocaleDateString('en-US', options) + "<br>";
+        var input = document.createElement("input");
+        input.type = "text";
+        input.classList.add("task-input");
+        input.dataset.day = day.toLocaleDateString('en-US', options);
+        dayBox.appendChild(input);
+        var saveButton = document.createElement("button");
+        saveButton.classList.add("save-button");
+        saveButton.innerText = "Save";
+        saveButton.onclick = function() { saveChanges(this.parentNode); };
+        dayBox.appendChild(saveButton);
+        weekContainer.appendChild(dayBox);
+      }
+      restoreText(); // Restore saved text
+    }
+
+    // Function to clear the text boxes
+    function clearText()
+    {
+      var textInputs = document.querySelectorAll('.task-input');
+      textInputs.forEach(function(input) {
+        input.value = ''; 
+      });
+    }
+
+    // Function to restore saved text
+    function restoreText() {
+      var textInputs = document.querySelectorAll('.task-input');
+      textInputs.forEach(function(input) {
+        var dayName = input.getAttribute('data-day').toLowerCase(); // Get the day name and convert to lowercase
+        var currentDate = new Date();
+        var key = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate() + '-' + dayName;
+        var savedText = localStorage.getItem(key);
+        if (savedText !== null) {
+          input.value = savedText; // Set the value from localStorage
+        }
+      });
+    }
+
+    // Restore saved text when returning to the week
+    window.addEventListener('DOMContentLoaded', function() {
+      var currentDateText = document.querySelector(".date-text");
+      var currentDate;
+      if (localStorage.getItem("currentDate")) {
+        currentDate = new Date(localStorage.getItem("currentDate"));
+      } else {
+        currentDate = new Date();
+      }
+      var options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      currentDateText.innerText = currentDate.toLocaleDateString('en-US', options);
+      loadWeek(currentDate); // Load the initial week
+    });
+  </script>
+</body>
+</html>
